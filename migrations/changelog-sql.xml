@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.21.xsd">
+
+    <changeSet id="init" author="hopenz">
+        <sqlFile path="scripts/init_tables.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <!--    <changeSet id="test_data" author="larchik">-->
+    <!--        <sqlFile path="scripts/filling_test_data_in_the_database.sql" relativeToChangelogFile="true"/>-->
+    <!--    </changeSet>-->
+
+</databaseChangeLog>
