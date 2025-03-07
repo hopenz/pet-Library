@@ -34,6 +34,6 @@ public class RegistrationController {
 
     @GetMapping("/")
     public String menu() {
-        return "menu";
+        return "redirect:/view/books";
     }
 }

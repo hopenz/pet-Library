@@ -1,17 +1,34 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Профиль пользователя</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #007bff;">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/view/books}" style="color: white;">📚 Библиотека</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/view/books}" style="color: white;"><i class="fa-solid fa-person"></i> Библиотека</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}" style="color: white;">Выход</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
 <div class="container mt-5">
     <h2>Профиль пользователя</h2>
-    <p><strong>Имя:</strong> Заглушка Имя</p>
-    <p><strong>Фамилия:</strong> Заглушка Фамилия</p>
-    <p><strong>Email:</strong> example@example.com</p>
-    <p><strong>Дата регистрации:</strong> 01.01.2023</p>
+    <p><strong>Имя:</strong> <span th:text="${user.name}"></span></p>
+    <p><strong>Фамилия:</strong> <span th:text="${user.surname}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
 </div>
 </body>
 </html>
+
