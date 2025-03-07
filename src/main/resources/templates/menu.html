@@ -56,6 +56,8 @@
                     <span class="input-group-text" style="cursor: pointer; " onclick="clearSearch()">
                     ×
                 </span>
+                    <!-- Скрытое поле для передачи жанра -->
+                    <input type="hidden" name="genre" th:value="${genre != null} ? ${genre} : ''">
                     <button class="btn btn-primary" type="submit">
                         Найти
                     </button>
@@ -68,16 +70,14 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <a class="dropdown-item"
-                                   th:href="@{/view/books/search(query=${query}, genre=, page=0)}"
-                                   th:style="${genre == null || genre.isEmpty()} ? 'background-color: #007bff; color: white;' : ''">
+                                   th:href="@{/view/books/search(query=${query}, genre=, page=0)}">
                                     Все жанры
                                 </a>
                             </li>
-                            <li th:each="g : ${genres}">
+                            <li th:each="genre : ${genres}">
                                 <a class="dropdown-item"
-                                   th:href="@{/view/books/search(query=${query}, genre=${g}, page=0)}"
-                                   th:text="${g}"
-                                   th:style="${genre == g} ? 'background-color: #007bff; color: white;' : ''"></a>
+                                   th:href="@{/view/books/search(query=${query}, genre=${genre}, page=0)}"
+                                   th:text="${genre}"></a>
                             </li>
                         </ul>
                     </div>
