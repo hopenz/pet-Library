@@ -13,17 +13,20 @@ public class Book {
     @Column(name = "book_id", nullable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
-    @Column(name = "author", nullable = false)
+    @Column(name = "author")
     private String author;
 
-    @Column(name = "publication_date", nullable = false)
+    @Column(name = "publication_date")
     private LocalDate publicationDate;
 
-    @Column(name = "genre", nullable = false)
+    @Column(name = "genre")
     private String genre;
+
+    @Column(name = "description")
+    private String description;
 
 
     public Book(Long id, String title, String author, LocalDate publicationDate, String genre) {
@@ -75,5 +78,13 @@ public class Book {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

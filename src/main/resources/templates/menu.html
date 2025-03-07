@@ -1,29 +1,180 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>MENU</title>
+    <title>Онлайн Библиотека</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        .book-card {
+            transition: transform 0.2s;
+            height: 100%;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-top {
+            height: 300px;
+            object-fit: cover;
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
+        <a class="navbar-brand" href="#">📚 Библиотека</a>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/swagger-ui/index.html}" th:text="'Swagger UI'"></a>
+                    <a class="nav-link" th:href="@{/swagger-ui/index.html}">Swagger UI</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/registration}" th:text="'Регистрация'"></a>
+                    <a class="nav-link" th:href="@{/registration}">Регистрация</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/logout}" th:text="'Выход'"></a>
+                    <a class="nav-link" th:href="@{/logout}">Выход</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Книжная коллекция</h1>
+
+    <!-- Поиск -->
+    <div class="row mb-4">
+        <div class="col-md-6 mx-auto">
+            <form th:action="@{/api/book/books/search}" method="GET">
+                <div class="input-group">
+                    <input type="text" class="form-control"
+                           placeholder="Поиск по книгам..."
+                           name="query"
+                           th:value="${query != null} ? ${query} : ''">
+                    <button class="btn btn-primary" type="submit">
+                        Найти
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Книги -->
+    <div th:if="${books != null and !books.isEmpty()}">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div th:each="book : ${books}" class="col">
+                <div class="card h-100 book-card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${book.title}">Название книги</h5>
+                        <h6 class="card-subtitle mb-2 text-muted" th:text="${book.author}">Автор</h6>
+                        <div class="mb-3">
+                            <span class="badge bg-primary" th:text="${book.genre}">Жанр</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#bookDetailsModal"
+                                th:data-title="${book.title}"
+                                th:data-author="${book.author}"
+                                th:data-genre="${book.genre}"
+                                th:data-description="${book.description != null ? book.description : 'Нет описания'}"
+                                th:data-date="${#temporals.format(book.publicationDate, 'dd.MM.yyyy')}">
+                            Подробнее
+                        </button>
+                        <small class="text-muted float-end"
+                               th:text="${#temporals.format(book.publicationDate, 'dd.MM.yyyy')}">
+                            [[${#temporals.format(book.publicationDate, 'dd.MM.yyyy')}]]
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Сообщение, если книги не найдены -->
+    <div th:if="${books == null or books.isEmpty()}" class="alert alert-warning mt-4">
+        <span th:if="${message != null}" th:text="${message}"></span>
+        <span th:if="${message == null}">Книги не найдены</span>
+    </div>
+
+    <!-- Пагинация -->
+    <nav th:if="${totalPages != null and totalPages > 1}" class="mt-5">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${query != null and !query.isEmpty()} ?
+                            '/api/book/books/search?query=' + ${query} + '&page=' + (${currentPage} - 1) :
+                            '/api/book/books?page=' + (${currentPage} - 1)}">
+                    Назад
+                </a>
+            </li>
+
+            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(1, totalPages)}"
+                th:classappend="${pageNumber - 1 == currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{${query != null and !query.isEmpty()} ?
+                            '/api/book/books/search?query=' + ${query} + '&page=' + (${pageNumber} - 1) :
+                            '/api/book/books?page=' + (${pageNumber} - 1)}"
+                   th:text="${pageNumber}"></a>
+            </li>
+
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${query != null and !query.isEmpty()} ?
+                            '/api/book/books/search?query=' + ${query} + '&page=' + (${currentPage} + 1) :
+                            '/api/book/books?page=' + (${currentPage} + 1)}">
+                    Вперед
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Модальное окно с деталями книги -->
+<div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-labelledby="bookDetailsModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Автор:</strong> <span id="bookAuthor"></span></p>
+                <p><strong>Жанр:</strong> <span id="bookGenre"></span></p>
+                <p><strong>Дата публикации:</strong> <span id="bookDate"></span></p>
+                <hr/>
+                <p id="bookDescription"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bookDetailsModal = document.getElementById('bookDetailsModal');
+        bookDetailsModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const bookTitle = button.getAttribute('data-title');
+            const bookAuthor = button.getAttribute('data-author');
+            const bookGenre = button.getAttribute('data-genre');
+            const bookDescription = button.getAttribute('data-description');
+            const bookDate = button.getAttribute('data-date');
+
+            bookDetailsModal.querySelector('.modal-title').textContent = bookTitle;
+            bookDetailsModal.querySelector('#bookAuthor').textContent = bookAuthor;
+            bookDetailsModal.querySelector('#bookGenre').textContent = bookGenre;
+            bookDetailsModal.querySelector('#bookDescription').textContent = bookDescription;
+            bookDetailsModal.querySelector('#bookDate').textContent = bookDate;
+        });
+    });
+</script>
+
 </body>
 </html>
