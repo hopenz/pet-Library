@@ -4,6 +4,9 @@
     <title>Онлайн Библиотека</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
     <style>
         .book-card {
             transition: transform 0.2s;
@@ -27,10 +30,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/swagger-ui/index.html}">Swagger UI</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/registration}">Регистрация</a>
+                    <a class="nav-link" th:href="@{/profile}"><i class="fa-solid fa-person"></i> Профиль</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/logout}">Выход</a>
@@ -40,25 +40,59 @@
     </div>
 </nav>
 
+
 <div class="container mt-5">
     <h1 class="text-center mb-4">Книжная коллекция</h1>
 
-    <!-- Поиск -->
+    <!-- Поиск и фильтр -->
     <div class="row mb-4">
-        <div class="col-md-6 mx-auto">
-            <form th:action="@{/api/book/books/search}" method="GET">
+        <div class="col-md-8 mx-auto">
+            <form th:action="@{/view/books/search}" method="GET" class="d-flex">
                 <div class="input-group">
                     <input type="text" class="form-control"
                            placeholder="Поиск по книгам..."
                            name="query"
                            th:value="${query != null} ? ${query} : ''">
+                    <span class="input-group-text" style="cursor: pointer; " onclick="clearSearch()">
+                    ×
+                </span>
                     <button class="btn btn-primary" type="submit">
                         Найти
                     </button>
+                    <!-- Кнопка "Фильтр" -->
+                    <div class="btn-group" style="margin-left: 0.5cm;">
+                        <button type="button" class="btn btn-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Фильтр по жанру
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item"
+                                   th:href="@{/view/books/search(query=${query}, genre=, page=0)}"
+                                   th:style="${genre == null || genre.isEmpty()} ? 'background-color: #007bff; color: white;' : ''">
+                                    Все жанры
+                                </a>
+                            </li>
+                            <li th:each="g : ${genres}">
+                                <a class="dropdown-item"
+                                   th:href="@{/view/books/search(query=${query}, genre=${g}, page=0)}"
+                                   th:text="${g}"
+                                   th:style="${genre == g} ? 'background-color: #007bff; color: white;' : ''"></a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
+
+    <script>
+        function clearSearch() {
+            document.getElementsByName('query')[0].value = '';
+            document.location.href = '/view/books/search';
+        }
+    </script>
+
 
     <!-- Книги -->
     <div th:if="${books != null and !books.isEmpty()}">
@@ -102,29 +136,26 @@
     <!-- Пагинация -->
     <nav th:if="${totalPages != null and totalPages > 1}" class="mt-5">
         <ul class="pagination justify-content-center">
+            <!-- Кнопка "Назад" -->
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{${query != null and !query.isEmpty()} ?
-                            '/api/book/books/search?query=' + ${query} + '&page=' + (${currentPage} - 1) :
-                            '/api/book/books?page=' + (${currentPage} - 1)}">
+                   th:href="@{/view/books/search(query=${query}, genre=${genre}, page=${currentPage - 1})}">
                     Назад
                 </a>
             </li>
 
+            <!-- Номера страниц -->
             <li class="page-item" th:each="pageNumber : ${#numbers.sequence(1, totalPages)}"
                 th:classappend="${pageNumber - 1 == currentPage} ? 'active'">
                 <a class="page-link"
-                   th:href="@{${query != null and !query.isEmpty()} ?
-                            '/api/book/books/search?query=' + ${query} + '&page=' + (${pageNumber} - 1) :
-                            '/api/book/books?page=' + (${pageNumber} - 1)}"
+                   th:href="@{/view/books/search(query=${query}, genre=${genre}, page=${pageNumber - 1})}"
                    th:text="${pageNumber}"></a>
             </li>
 
+            <!-- Кнопка "Вперед" -->
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{${query != null and !query.isEmpty()} ?
-                            '/api/book/books/search?query=' + ${query} + '&page=' + (${currentPage} + 1) :
-                            '/api/book/books?page=' + (${currentPage} + 1)}">
+                   th:href="@{/view/books/search(query=${query}, genre=${genre}, page=${currentPage + 1})}">
                     Вперед
                 </a>
             </li>

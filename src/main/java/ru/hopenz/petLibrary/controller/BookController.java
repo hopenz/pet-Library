@@ -5,16 +5,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.hopenz.petLibrary.data.dto.RequestBookDto;
 import ru.hopenz.petLibrary.data.dto.RequestFiltersForBooksDto;
+import ru.hopenz.petLibrary.data.dto.RequestGenreForBooksDto;
 import ru.hopenz.petLibrary.data.dto.ResponseBookDto;
-import ru.hopenz.petLibrary.data.entity.Book;
 import ru.hopenz.petLibrary.data.mapper.BookMapper;
 import ru.hopenz.petLibrary.service.BookService;
 
@@ -86,53 +84,25 @@ public class BookController {
     }
 
     /**
-     * Вывод существующих книг в html
+     * Фильтрация книг по жанру
      *
      * @param page
      * @param size
-     * @param model
+     * @param requestGenreForBooksDto
      * @return
      */
-    @GetMapping("/books")
-    public String showBooks(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Model model
-    ) {
-        Page<ResponseBookDto> bookPage = bookService.getBooks(page, size);
+    @Operation(summary = "Получить отфильтрованные книги", description = "Фильтрация по жанру")
+    @PostMapping("/Genre")
+    public ResponseEntity<Page<ResponseBookDto>> getBooksWithGenre(
+            @Parameter(name = "page", description = "Номер страницы", example = "0")
+            @NotNull @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @Parameter(name = "size", description = "Размер страницы", example = "10")
+            @NotNull @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") Integer size,
+            @RequestBody @Validated RequestGenreForBooksDto requestGenreForBooksDto) {
+        Page<ResponseBookDto> responseBookDtoPage =
+                bookService.getBooksWithGenre(page, size, requestGenreForBooksDto);
 
-        model.addAttribute("books", bookPage.getContent());
-        model.addAttribute("currentPage", bookPage.getNumber());
-        model.addAttribute("totalPages", bookPage.getTotalPages());
-        return "menu";
-    }
-
-    @GetMapping("/books/search")
-    public String searchBooks(@RequestParam(name = "query", required = false) String query,
-                              @RequestParam(name = "page", defaultValue = "0") int page,
-                              Model model) {
-        int pageSize = 10;
-        PageRequest pageable = PageRequest.of(page, pageSize);
-
-        Page<ResponseBookDto> booksPage;
-
-        if (query == null || query.isBlank()) {
-            booksPage = bookService.getBooks(page, pageSize);
-        } else {
-            Page<Book> rawBooksPage = bookService.searchBooks(query, pageable);
-            booksPage = rawBooksPage.map(bookMapper::toResponseDto);
-        }
-
-        model.addAttribute("books", booksPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", booksPage.getTotalPages());
-        model.addAttribute("query", query);
-
-        if (booksPage.isEmpty()) {
-            model.addAttribute("message", "Книги не найдены");
-        }
-
-        return "menu";
+        return ResponseEntity.ok(responseBookDtoPage);
     }
 
 }

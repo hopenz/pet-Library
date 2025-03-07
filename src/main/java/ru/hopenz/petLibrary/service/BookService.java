@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import ru.hopenz.petLibrary.data.dto.RequestBookDto;
 import ru.hopenz.petLibrary.data.dto.RequestFiltersForBooksDto;
+import ru.hopenz.petLibrary.data.dto.RequestGenreForBooksDto;
 import ru.hopenz.petLibrary.data.dto.ResponseBookDto;
 import ru.hopenz.petLibrary.data.entity.Book;
 import ru.hopenz.petLibrary.data.mapper.BookMapper;
@@ -96,7 +97,7 @@ public class BookService {
                 book.getId(),
                 book.getTitle(),
                 book.getAuthor(),
-                book.getPublicationDate(), // Проверьте название поля в Entity
+                book.getPublicationDate(),
                 book.getGenre(),
                 book.getDescription()
         ));
@@ -114,7 +115,26 @@ public class BookService {
         return books.map(bookMapper::toResponseDto);
     }
 
-    public Page<Book> searchBooks(String query, Pageable pageable) {
-        return bookRepository.searchBooks(query, pageable);
+    // В сервисе
+    public Page<Book> searchBooks(String query, String genre, Pageable pageable) {
+        return bookRepository.findByTitleOrAuthorOrGenre(
+                query != null ? query : "",
+                genre != null ? genre : "",
+                pageable
+        );
+    }
+
+    public Page<ResponseBookDto> getBooksWithGenre(Integer page, Integer size, RequestGenreForBooksDto requestGenreForBooksDto) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Book> bookSpecification = Specification.
+                where(BookSpecification.hasGenre(requestGenreForBooksDto.genre()));
+
+        Page<Book> books = bookRepository.findAll(bookSpecification, pageable);
+
+        return books.map(bookMapper::toResponseDto);
+    }
+
+    public List<String> getAllGenres() {
+        return bookRepository.findAllGenre();
     }
 }

@@ -19,4 +19,11 @@ public class BookSpecification {
         };
     }
 
+    public static Specification<Book> hasGenre(String genre) {
+        return (root, query, criteriaBuilder) -> {
+            if (genre == null) return null;
+            return criteriaBuilder.like(root.get("genre"), genre + "%");
+        };
+    }
+
 }
