@@ -23,10 +23,12 @@ CREATE TABLE IF NOT EXISTS "books"
     "author"           varchar,
     "publication_date" DATE,
     "genre"            varchar,
-    "booked"           boolean,
+    "is_booked"        boolean,
     "reader_id"        BIGINT REFERENCES users (user_id),
     "booking_date"     DATE,
+    "booked_before"    DATE,
     "description"      varchar
+
 );
 
 COMMIT;

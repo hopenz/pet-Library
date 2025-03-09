@@ -8,6 +8,7 @@ import ru.hopenz.petLibrary.data.entity.enums.UserRole;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -37,8 +38,8 @@ public class User implements UserDetails{
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-//    @OneToMany(mappedBy = "books")
-//    private List<Book> bookedBooks;
+    @OneToMany(mappedBy = "bookedUser")
+    private List<Book> bookedBooks;
 
     public Long getId() {
         return id;

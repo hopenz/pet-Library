@@ -28,13 +28,32 @@ public class Book {
     @Column(name = "description")
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "reader_id")
+    private User bookedUser;
 
-    public Book(Long id, String title, String author, LocalDate publicationDate, String genre) {
+    @Column(name = "is_booked")
+    private boolean isBooked;
+
+    @Column(name = "booking_date")
+    private LocalDate bookingDate;
+
+    @Column(name = "booked_before")
+    private LocalDate bookedBefore;
+
+
+    public Book(Long id, String title, String author, LocalDate publicationDate, String genre, String description,
+                User bookedUser, boolean isBooked, LocalDate bookingDate,LocalDate bookedBefore) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.publicationDate = publicationDate;
         this.genre = genre;
+        this.description = description;
+        this.bookedUser = bookedUser;
+        this.isBooked = isBooked;
+        this.bookingDate = bookingDate;
+        this.bookedBefore = bookedBefore;
     }
 
     public Book() {
@@ -86,5 +105,37 @@ public class Book {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public User getBookedUser() {
+        return bookedUser;
+    }
+
+    public void setBookedUser(User bookedUser) {
+        this.bookedUser = bookedUser;
+    }
+
+    public boolean isBooked() {
+        return isBooked;
+    }
+
+    public void setBooked(boolean booked) {
+        isBooked = booked;
+    }
+
+    public LocalDate getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(LocalDate bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+
+    public LocalDate getBookedBefore() {
+        return bookedBefore;
+    }
+
+    public void setBookedBefore(LocalDate bookedBefore) {
+        this.bookedBefore = bookedBefore;
     }
 }

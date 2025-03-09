@@ -44,7 +44,8 @@ public class BookService {
         Book bookDB = bookRepository.save(newBook);
 
         return new ResponseBookDto(bookDB.getId(), bookDB.getTitle(),
-                bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription());
+                bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription(), bookDB.getBookedUser(),
+                bookDB.isBooked(),bookDB.getPublicationDate(), bookDB.getBookedBefore());
     }
 
     public void deleteBook(Long id) {
@@ -64,7 +65,8 @@ public class BookService {
         bookRepository.save(book);
 
         return new ResponseBookDto(book.getId(), book.getTitle(),
-                book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription());
+                book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription(),book.getBookedUser(),
+                book.isBooked(),book.getPublicationDate(), book.getBookedBefore());
     }
 
     @Transactional
@@ -74,7 +76,8 @@ public class BookService {
         for (int i = 0; i < allBooks.size(); i++) {
             Book bookDB = allBooks.get(i);
             responseList.add(new ResponseBookDto(bookDB.getId(), bookDB.getTitle(),
-                    bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription()));
+                    bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription(),bookDB.getBookedUser(),
+                    bookDB.isBooked(),bookDB.getPublicationDate(), bookDB.getBookedBefore()));
         }
 
         return responseList;
@@ -85,7 +88,8 @@ public class BookService {
                 -> new EntityNotFoundException("book", id));
 
         return new ResponseBookDto(book.getId(), book.getTitle(),
-                book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription());
+                book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription(),book.getBookedUser(),
+                book.isBooked(),book.getPublicationDate(),book.getBookedBefore());
     }
 
 
@@ -93,14 +97,7 @@ public class BookService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Book> bookPage = bookRepository.findAll(pageable);
 
-        return bookPage.map(book -> new ResponseBookDto(
-                book.getId(),
-                book.getTitle(),
-                book.getAuthor(),
-                book.getPublicationDate(),
-                book.getGenre(),
-                book.getDescription()
-        ));
+        return bookPage.map(bookMapper::toResponseDto);
     }
 
     public Page<ResponseBookDto> getBooksWithFilters(Integer page, Integer size, RequestFiltersForBooksDto requestFiltersForBooksDto) {
@@ -116,12 +113,13 @@ public class BookService {
     }
 
     // В сервисе
-    public Page<Book> searchBooks(String query, String genre, Pageable pageable) {
-        return bookRepository.findByTitleOrAuthorOrGenre(
+    public Page<ResponseBookDto> searchBooks(String query, String genre, Pageable pageable) {
+        Page<Book> bookPage =  bookRepository.findByTitleOrAuthorOrGenre(
                 query != null ? query : "",
                 genre != null ? genre : "",
                 pageable
         );
+        return bookPage.map(bookMapper::toResponseDto);
     }
 
     public Page<ResponseBookDto> getBooksWithGenre(Integer page, Integer size, RequestGenreForBooksDto requestGenreForBooksDto) {

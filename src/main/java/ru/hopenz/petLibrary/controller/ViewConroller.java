@@ -76,8 +76,8 @@ public class ViewConroller {
             booksPage = bookService.getBooks(page, pageSize);
         } else {
             // Если есть хотя бы один параметр - выполняем поиск
-            Page<Book> rawBooksPage = bookService.searchBooks(query, genre, pageable);
-            booksPage = rawBooksPage.map(bookMapper::toResponseDto);
+            booksPage = bookService.searchBooks(query, genre, pageable);
+
         }
 
         addGenresToModel(model);
