@@ -2,6 +2,9 @@ package ru.hopenz.petLibrary.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -9,9 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.hopenz.petLibrary.data.dto.ResponseBookDto;
-import ru.hopenz.petLibrary.data.entity.Book;
-import ru.hopenz.petLibrary.data.mapper.BookMapper;
+import ru.hopenz.petLibrary.data.entity.User;
+import ru.hopenz.petLibrary.data.entity.enums.UserRole;
+import ru.hopenz.petLibrary.repository.UserRepository;
 import ru.hopenz.petLibrary.service.BookService;
+import ru.hopenz.petLibrary.service.UserService;
 
 import java.util.List;
 
@@ -21,11 +26,11 @@ import java.util.List;
 public class ViewConroller {
 
     private final BookService bookService;
-    private final BookMapper bookMapper;
+    private final UserRepository userRepository;
 
-    public ViewConroller(BookService bookService, BookMapper bookMapper) {
+    public ViewConroller(BookService bookService, UserRepository userRepository) {
         this.bookService = bookService;
-        this.bookMapper = bookMapper;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -45,6 +50,7 @@ public class ViewConroller {
         Page<ResponseBookDto> bookPage = bookService.getBooks(page, size);
 
         addGenresToModel(model);
+        addUserRoleToModel(model); // Добавляем роль пользователя в модель
 
         model.addAttribute("books", bookPage.getContent());
         model.addAttribute("currentPage", bookPage.getNumber());
@@ -77,10 +83,10 @@ public class ViewConroller {
         } else {
             // Если есть хотя бы один параметр - выполняем поиск
             booksPage = bookService.searchBooks(query, genre, pageable);
-
         }
 
         addGenresToModel(model);
+        addUserRoleToModel(model); // Добавляем роль пользователя в модель
 
         model.addAttribute("books", booksPage.getContent());
         model.addAttribute("currentPage", page);
@@ -96,4 +102,13 @@ public class ViewConroller {
         model.addAttribute("genres", genres);
     }
 
+    private void addUserRoleToModel(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username);
+            UserRole role = user.getRole();
+            model.addAttribute("userRole", role.name());
+        }
+    }
 }

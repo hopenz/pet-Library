@@ -11,6 +11,11 @@
         <a class="navbar-brand" th:href="@{/view/books}" style="color: white;">📚 Библиотека</a>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item" th:if="${userRole == 'ROLE_ADMIN'}">
+                    <a class="nav-link" href="/swagger-ui.html" style="color: white;">
+                        <i class="fa-solid fa-gear"></i> Swagger
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/view/books}" style="color: white;"><i class="fa-solid fa-person"></i> Библиотека</a>
                 </li>
@@ -28,6 +33,7 @@
     <p><strong>Имя:</strong> <span th:text="${user.name}"></span></p>
     <p><strong>Фамилия:</strong> <span th:text="${user.surname}"></span></p>
     <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+    <p><strong>Роль:</strong> <span th:text="${user.getRole().getRole()}"></span></p>
 </div>
 </body>
 </html>

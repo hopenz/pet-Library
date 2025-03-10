@@ -6,6 +6,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.hopenz.petLibrary.data.entity.User;
+import ru.hopenz.petLibrary.data.entity.enums.UserRole;
+import ru.hopenz.petLibrary.repository.UserRepository;
 import ru.hopenz.petLibrary.service.UserService;
 
 import java.security.Principal;
@@ -16,9 +18,11 @@ import java.security.Principal;
 public class ViewProfileController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    public ViewProfileController(UserService userService) {
+    public ViewProfileController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/profile")
@@ -26,11 +30,11 @@ public class ViewProfileController {
         String username = principal.getName();
 
         User user = userService.findByUsername(username);
-        System.out.println(username);
-        System.out.println(user.getName());
-        System.out.println(user.getId());
 
         model.addAttribute("user", user);
+        User user1 = userRepository.findByUsername(username);
+        UserRole role = user1.getRole();
+        model.addAttribute("userRole", role.name());
 
         return "profile";
     }
