@@ -46,8 +46,6 @@
     </div>
 </nav>
 
-
-
 <div class="container mt-5">
     <h1 class="text-center mb-4">Книжная коллекция</h1>
 
@@ -100,7 +98,6 @@
         }
     </script>
 
-
     <!-- Книги -->
     <div th:if="${books != null and !books.isEmpty()}">
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -129,7 +126,8 @@
                                 th:data-author="${book.author}"
                                 th:data-genre="${book.genre}"
                                 th:data-description="${book.description != null} ? ${book.description} : 'Нет описания'"
-                                th:data-date="${#temporals.format(book.publicationDate, 'dd.MM.yyyy')}">
+                                th:data-date="${#temporals.format(book.publicationDate, 'dd.MM.yyyy')}"
+                                th:data-booked="${book.booked}"> <!-- Добавляем статус бронирования -->
                             Подробнее
                         </button>
                         <small class="text-muted float-end"
@@ -196,6 +194,30 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <!-- Кнопка "Забронировать" -->
+                <button id="reserveButton" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reserveModal">
+                    Забронировать
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для ввода количества дней бронирования -->
+<div class="modal fade" id="reserveModal" tabindex="-1" aria-labelledby="reserveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reserveModalLabel">Бронирование книги</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="reserveDays">На сколько дней вы хотите забронировать книгу?</label>
+                <input type="number" id="reserveDays" class="form-control" min="1">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary">Подтвердить бронирование</button>
             </div>
         </div>
     </div>
@@ -205,6 +227,8 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const bookDetailsModal = document.getElementById('bookDetailsModal');
+        const reserveButton = document.getElementById('reserveButton');
+
         bookDetailsModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const bookTitle = button.getAttribute('data-title');
@@ -212,12 +236,20 @@
             const bookGenre = button.getAttribute('data-genre');
             const bookDescription = button.getAttribute('data-description');
             const bookDate = button.getAttribute('data-date');
+            const isBooked = button.getAttribute('data-booked') === 'true'; // Получаем статус бронирования
 
             bookDetailsModal.querySelector('.modal-title').textContent = bookTitle;
             bookDetailsModal.querySelector('#bookAuthor').textContent = bookAuthor;
             bookDetailsModal.querySelector('#bookGenre').textContent = bookGenre;
             bookDetailsModal.querySelector('#bookDescription').textContent = bookDescription;
             bookDetailsModal.querySelector('#bookDate').textContent = bookDate;
+
+            // Управление видимостью кнопки "Забронировать"
+            if (isBooked) {
+                reserveButton.style.display = 'none'; // Скрыть кнопку, если книга забронирована
+            } else {
+                reserveButton.style.display = 'inline-block'; // Показать кнопку, если книга свободна
+            }
         });
     });
 </script>
