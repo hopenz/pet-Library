@@ -3,6 +3,7 @@ package ru.hopenz.petLibrary.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -92,7 +93,7 @@ public class BookController {
      * @return
      */
     @Operation(summary = "Получить отфильтрованные книги", description = "Фильтрация по жанру")
-    @PostMapping("/Genre")
+    @PostMapping("/genre")
     public ResponseEntity<Page<ResponseBookDto>> getBooksWithGenre(
             @Parameter(name = "page", description = "Номер страницы", example = "0")
             @NotNull @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -105,4 +106,18 @@ public class BookController {
         return ResponseEntity.ok(responseBookDtoPage);
     }
 
+    /**
+     * Бронирование книги на n-ое количество дней
+     */
+    @Operation(summary = "Бронирование книги", description = "Бронирование книги пользователем")
+    @PutMapping("/booking")
+    public ResponseEntity<ResponseBookDto> bookingBook(
+            @Parameter(name = "userId", description = "id пользователя", example = "1")
+            @NotNull @Positive @RequestParam(value = "userId") Long userId,
+            @Parameter(name = "bookId", description = "id книги", example = "1")
+            @NotNull @Positive @RequestParam(value = "bookId") Long bookId,
+            @Parameter(name = "dayOfBooking", description = "n-ое количество дней бронирования книги", example = "1")
+            @NotNull @Positive @RequestParam(value = "dayOfBooking") Integer dayOfBooking) {
+        return ResponseEntity.ok(bookService.bookingBook(userId, bookId, dayOfBooking));
+    }
 }

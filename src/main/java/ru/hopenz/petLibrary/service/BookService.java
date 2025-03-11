@@ -12,10 +12,13 @@ import ru.hopenz.petLibrary.data.dto.RequestFiltersForBooksDto;
 import ru.hopenz.petLibrary.data.dto.RequestGenreForBooksDto;
 import ru.hopenz.petLibrary.data.dto.ResponseBookDto;
 import ru.hopenz.petLibrary.data.entity.Book;
+import ru.hopenz.petLibrary.data.entity.User;
 import ru.hopenz.petLibrary.data.mapper.BookMapper;
 import ru.hopenz.petLibrary.exception.EntityNotFoundException;
 import ru.hopenz.petLibrary.repository.BookRepository;
+import ru.hopenz.petLibrary.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +29,12 @@ public class BookService {
     private final BookRepository bookRepository;
 
     private final BookMapper bookMapper;
+    private final UserRepository userRepository;
 
-    public BookService(BookRepository bookRepository, BookMapper bookMapper) {
+    public BookService(BookRepository bookRepository, BookMapper bookMapper, UserRepository userRepository) {
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -44,7 +49,7 @@ public class BookService {
         Book bookDB = bookRepository.save(newBook);
 
         return new ResponseBookDto(bookDB.getId(), bookDB.getTitle(),
-                bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription(), bookDB.getBookedUser(),
+                bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription(),
                 bookDB.isBooked(),bookDB.getPublicationDate(), bookDB.getBookedBefore());
     }
 
@@ -65,7 +70,7 @@ public class BookService {
         bookRepository.save(book);
 
         return new ResponseBookDto(book.getId(), book.getTitle(),
-                book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription(),book.getBookedUser(),
+                book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription(),
                 book.isBooked(),book.getPublicationDate(), book.getBookedBefore());
     }
 
@@ -76,7 +81,7 @@ public class BookService {
         for (int i = 0; i < allBooks.size(); i++) {
             Book bookDB = allBooks.get(i);
             responseList.add(new ResponseBookDto(bookDB.getId(), bookDB.getTitle(),
-                    bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription(),bookDB.getBookedUser(),
+                    bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription(),
                     bookDB.isBooked(),bookDB.getPublicationDate(), bookDB.getBookedBefore()));
         }
 
@@ -88,7 +93,7 @@ public class BookService {
                 -> new EntityNotFoundException("book", id));
 
         return new ResponseBookDto(book.getId(), book.getTitle(),
-                book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription(),book.getBookedUser(),
+                book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription(),
                 book.isBooked(),book.getPublicationDate(),book.getBookedBefore());
     }
 
@@ -134,5 +139,22 @@ public class BookService {
 
     public List<String> getAllGenres() {
         return bookRepository.findAllGenre();
+    }
+
+    public ResponseBookDto bookingBook(Long userId, Long bookId, Integer dayOfBooking) {
+        Book book = bookRepository.findById(bookId).orElseThrow(()
+                -> new EntityNotFoundException("book", bookId));
+
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new EntityNotFoundException("user", userId));
+
+        book.setBooked(true);
+        book.setBookingDate(LocalDate.now());
+        book.setBookedBefore(book.getBookingDate().plusDays(dayOfBooking));
+        user.addBook(book);
+
+        bookRepository.save(book);
+
+        return bookMapper.toResponseDto(book);
     }
 }

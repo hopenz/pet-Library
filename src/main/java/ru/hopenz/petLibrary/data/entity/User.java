@@ -6,6 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.hopenz.petLibrary.data.entity.enums.UserRole;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -101,5 +102,16 @@ public class User implements UserDetails{
     public Collection<? extends GrantedAuthority> getAuthorities() {
         UserRole userRole = getRole();
         return Collections.singleton(new SimpleGrantedAuthority(userRole.name()));
+    }
+
+    public List<Book> getBookedBooks() {
+        return bookedBooks;
+    }
+
+    public void addBook(Book book) {
+        if (bookedBooks == null) {
+            bookedBooks = new ArrayList<>();
+        }
+        bookedBooks.add(book);
     }
 }

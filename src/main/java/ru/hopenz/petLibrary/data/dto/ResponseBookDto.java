@@ -7,6 +7,6 @@ import java.time.LocalDate;
 
 public record ResponseBookDto(Long id, String title, String author,
                               LocalDate publicationDate, String genre, String description,
-                              User bookedUser, boolean isBooked, LocalDate bookingDate,
+                              boolean isBooked, LocalDate bookingDate,
                               LocalDate bookedBefore) implements Serializable {
 }
