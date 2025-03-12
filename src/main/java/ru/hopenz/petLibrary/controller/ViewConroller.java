@@ -2,15 +2,15 @@ package ru.hopenz.petLibrary.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ru.hopenz.petLibrary.data.dto.ResponseBookDto;
 import ru.hopenz.petLibrary.data.entity.User;
 import ru.hopenz.petLibrary.data.entity.enums.UserRole;
@@ -19,6 +19,7 @@ import ru.hopenz.petLibrary.service.BookService;
 import ru.hopenz.petLibrary.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/view")
@@ -109,6 +110,18 @@ public class ViewConroller {
             User user = userRepository.findByUsername(username);
             UserRole role = user.getRole();
             model.addAttribute("userRole", role.name());
+        }
+    }
+
+    @PostMapping("/books/{id}/reserve")
+    @ResponseBody // Указываем, что метод возвращает JSON, а не имя представления
+    public ResponseEntity<?> reserveBook(@PathVariable Long id, @RequestBody Map<String, Integer> request) {
+        int days = request.get("days");
+        try {
+            bookService.reserveBook(id, days);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
         }
     }
 }

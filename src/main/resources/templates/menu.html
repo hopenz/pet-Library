@@ -122,12 +122,13 @@
                         <button class="btn btn-outline-primary"
                                 data-bs-toggle="modal"
                                 data-bs-target="#bookDetailsModal"
+                                th:data-id="${book.id}"
                                 th:data-title="${book.title}"
                                 th:data-author="${book.author}"
                                 th:data-genre="${book.genre}"
                                 th:data-description="${book.description != null} ? ${book.description} : 'Нет описания'"
                                 th:data-date="${#temporals.format(book.publicationDate, 'dd.MM.yyyy')}"
-                                th:data-booked="${book.booked}"> <!-- Добавляем статус бронирования -->
+                                th:data-booked="${book.booked}">
                             Подробнее
                         </button>
                         <small class="text-muted float-end"
@@ -217,7 +218,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary">Подтвердить бронирование</button>
+                <!-- Кнопка "Подтвердить бронирование" -->
+                <button type="button" id="confirmReserveButton" class="btn btn-primary">Подтвердить бронирование</button>
             </div>
         </div>
     </div>
@@ -228,6 +230,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         const bookDetailsModal = document.getElementById('bookDetailsModal');
         const reserveButton = document.getElementById('reserveButton');
+        const confirmReserveButton = document.getElementById('confirmReserveButton');
+        const reserveDaysInput = document.getElementById('reserveDays');
+        let currentBookId = null; // Будет хранить ID текущей книги
 
         bookDetailsModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
@@ -236,7 +241,10 @@
             const bookGenre = button.getAttribute('data-genre');
             const bookDescription = button.getAttribute('data-description');
             const bookDate = button.getAttribute('data-date');
-            const isBooked = button.getAttribute('data-booked') === 'true'; // Получаем статус бронирования
+            const isBooked = button.getAttribute('data-booked') === 'true';
+            currentBookId = button.getAttribute('data-id'); // Получаем ID книги
+
+            console.log('Current Book ID:', currentBookId); // Для отладки
 
             bookDetailsModal.querySelector('.modal-title').textContent = bookTitle;
             bookDetailsModal.querySelector('#bookAuthor').textContent = bookAuthor;
@@ -246,10 +254,45 @@
 
             // Управление видимостью кнопки "Забронировать"
             if (isBooked) {
-                reserveButton.style.display = 'none'; // Скрыть кнопку, если книга забронирована
+                reserveButton.style.display = 'none';
             } else {
-                reserveButton.style.display = 'inline-block'; // Показать кнопку, если книга свободна
+                reserveButton.style.display = 'inline-block';
             }
+        });
+
+        // Обработчик для кнопки "Подтвердить бронирование"
+        confirmReserveButton.addEventListener('click', function () {
+            const days = reserveDaysInput.value;
+
+            if (!days || days < 1) {
+                alert('Укажите количество дней для бронирования.');
+                return;
+            }
+
+            if (!currentBookId) {
+                alert('Ошибка: ID книги не указан.');
+                return;
+            }
+
+            // Отправка запроса на сервер
+            fetch(`/view/books/${currentBookId}/reserve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ days: parseInt(days) }),
+            })
+                .then(data => {
+                    //alert('Книга успешно забронирована!');
+                    // Закрываем модальное окно
+                    const reserveModal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
+                    reserveModal.hide();
+                    window.location.href = '/view/books/search';
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при бронировании книги.');
+                });
         });
     });
 </script>

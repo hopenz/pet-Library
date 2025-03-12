@@ -157,4 +157,18 @@ public class BookService {
 
         return bookMapper.toResponseDto(book);
     }
+
+    public void reserveBook(Long id, int days) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Книга не найдена"));
+
+        if (book.isBooked()) {
+            throw new RuntimeException("Книга уже забронирована");
+        }
+
+        // Устанавливаем статус бронирования и дату окончания бронирования
+        book.setBooked(true);
+        book.setBookedBefore(LocalDate.now().plusDays(days));
+        bookRepository.save(book);
+    }
 }
