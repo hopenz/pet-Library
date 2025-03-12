@@ -4,6 +4,12 @@
     <title>Профиль пользователя</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <style>
+        .table-hover tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #007bff;">
@@ -27,14 +33,48 @@
     </div>
 </nav>
 
-
 <div class="container mt-5">
     <h2>Профиль пользователя</h2>
-    <p><strong>Имя:</strong> <span th:text="${user.name}"></span></p>
-    <p><strong>Фамилия:</strong> <span th:text="${user.surname}"></span></p>
-    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
-    <p><strong>Роль:</strong> <span th:text="${user.getRole().getRole()}"></span></p>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Информация о пользователе</h5>
+            <p><strong>Имя:</strong> <span th:text="${user.name}"></span></p>
+            <p><strong>Фамилия:</strong> <span th:text="${user.surname}"></span></p>
+            <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+            <p><strong>Роль:</strong> <span th:text="${user.getRole().getRole()}"></span></p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Забронированные книги</h5>
+            <div th:if="${not #lists.isEmpty(user.bookedBooks)}">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Автор</th>
+                        <th>Жанр</th>
+                        <th>Дата бронирования</th>
+                        <th>Дата возврата</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="book : ${user.bookedBooks}">
+                        <td th:text="${book.title}"></td>
+                        <td th:text="${book.author}"></td>
+                        <td th:text="${book.genre}"></td>
+                        <td th:text="${#temporals.format(book.bookingDate, 'dd.MM.yyyy')}"></td>
+                        <td th:text="${#temporals.format(book.bookedBefore, 'dd.MM.yyyy')}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${#lists.isEmpty(user.bookedBooks)}" class="alert alert-info">
+                У вас нет забронированных книг.
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
-
