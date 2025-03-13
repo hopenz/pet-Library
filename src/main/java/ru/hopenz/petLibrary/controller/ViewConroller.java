@@ -18,6 +18,7 @@ import ru.hopenz.petLibrary.repository.UserRepository;
 import ru.hopenz.petLibrary.service.BookService;
 import ru.hopenz.petLibrary.service.UserService;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -113,12 +114,19 @@ public class ViewConroller {
         }
     }
 
+    // При бронировании книги не добавляется текущая дата и id читателя
     @PostMapping("/books/{id}/reserve")
-    @ResponseBody // Указываем, что метод возвращает JSON, а не имя представления
-    public ResponseEntity<?> reserveBook(@PathVariable Long id, @RequestBody Map<String, Integer> request) {
+    @ResponseBody
+    public ResponseEntity<?> reserveBook(@PathVariable Long id, @RequestBody Map<String, Integer> request, Principal principal) {
         int days = request.get("days");
+
+        // Получаем текущего пользователя
+        String username = principal.getName();
+        User user = userRepository.findByUsername(username);
+
         try {
-            bookService.reserveBook(id, days);
+            // Передаем ID пользователя в метод reserveBook
+            bookService.reserveBook(id, days, user.getId());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));

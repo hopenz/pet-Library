@@ -152,23 +152,35 @@ public class BookService {
         book.setBookingDate(LocalDate.now());
         book.setBookedBefore(book.getBookingDate().plusDays(dayOfBooking));
         user.addBook(book);
+        book.setBookedUser(user);
 
         bookRepository.save(book);
 
         return bookMapper.toResponseDto(book);
     }
 
-    public void reserveBook(Long id, int days) {
+    public void reserveBook(Long id, int days, Long userId) {
+        // Находим книгу по ID
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Книга не найдена"));
 
+        // Проверяем, забронирована ли книга
         if (book.isBooked()) {
             throw new RuntimeException("Книга уже забронирована");
         }
 
-        // Устанавливаем статус бронирования и дату окончания бронирования
+        // Находим пользователя по ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        // Устанавливаем статус бронирования, дату возврата и пользователя
         book.setBooked(true);
+        book.setBookingDate(LocalDate.now());
         book.setBookedBefore(LocalDate.now().plusDays(days));
+        book.setBookedUser(user);
+        user.addBook(book);
+
+        // Сохраняем изменения
         bookRepository.save(book);
     }
 }
