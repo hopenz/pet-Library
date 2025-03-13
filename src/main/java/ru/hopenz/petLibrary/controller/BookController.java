@@ -120,4 +120,18 @@ public class BookController {
             @NotNull @Positive @RequestParam(value = "dayOfBooking") Integer dayOfBooking) {
         return ResponseEntity.ok(bookService.bookingBook(userId, bookId, dayOfBooking));
     }
+
+    /**
+     * Снятие бронирования с книги
+     */
+    @Operation(summary = "Снятие бронирования с книги", description = "Снятие бронирования с книги")
+    @PutMapping("/unlock")
+    public ResponseEntity<ResponseBookDto> bookingBook(
+            @Parameter(name = "userId", description = "id пользователя", example = "1")
+            @NotNull @Positive @RequestParam(value = "userId") Long userId,
+            @Parameter(name = "bookId", description = "id книги", example = "1")
+            @NotNull @Positive @RequestParam(value = "bookId") Long bookId) {
+        return ResponseEntity.ok(bookService.unlock(userId, bookId));
+    }
+
 }

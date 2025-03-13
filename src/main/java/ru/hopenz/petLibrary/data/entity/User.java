@@ -114,4 +114,8 @@ public class User implements UserDetails{
         }
         bookedBooks.add(book);
     }
+
+    public void deleteBook(Book book) {
+        bookedBooks.remove(book);
+    }
 }

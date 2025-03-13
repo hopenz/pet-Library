@@ -160,27 +160,43 @@ public class BookService {
     }
 
     public void reserveBook(Long id, int days, Long userId) {
-        // Находим книгу по ID
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Книга не найдена"));
 
-        // Проверяем, забронирована ли книга
         if (book.isBooked()) {
             throw new RuntimeException("Книга уже забронирована");
         }
 
-        // Находим пользователя по ID
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        // Устанавливаем статус бронирования, дату возврата и пользователя
         book.setBooked(true);
         book.setBookingDate(LocalDate.now());
         book.setBookedBefore(LocalDate.now().plusDays(days));
         book.setBookedUser(user);
         user.addBook(book);
 
-        // Сохраняем изменения
         bookRepository.save(book);
+    }
+
+    public ResponseBookDto unlock(Long userId, Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Книга не найдена"));
+
+        if (!book.isBooked()) {
+            throw new RuntimeException("Книга не забронирована");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        book.setBooked(false);
+        book.setBookedUser(null);
+        book.setBookedBefore(null);
+        book.setBookingDate(null);
+        user.deleteBook(book);
+
+        bookRepository.save(book);
+        return bookMapper.toResponseDto(book);
     }
 }

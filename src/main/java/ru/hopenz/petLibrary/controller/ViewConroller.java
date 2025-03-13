@@ -114,7 +114,6 @@ public class ViewConroller {
         }
     }
 
-    // При бронировании книги не добавляется текущая дата и id читателя
     @PostMapping("/books/{id}/reserve")
     @ResponseBody
     public ResponseEntity<?> reserveBook(@PathVariable Long id, @RequestBody Map<String, Integer> request, Principal principal) {

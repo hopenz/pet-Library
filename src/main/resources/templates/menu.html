@@ -274,7 +274,6 @@
                 return;
             }
 
-            // Отправка запроса на сервер
             fetch(`/view/books/${currentBookId}/reserve`, {
                 method: 'POST',
                 headers: {
@@ -283,8 +282,6 @@
                 body: JSON.stringify({ days: parseInt(days) }),
             })
                 .then(data => {
-                    //alert('Книга успешно забронирована!');
-                    // Закрываем модальное окно
                     const reserveModal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
                     reserveModal.hide();
                     window.location.href = '/view/books/search';
