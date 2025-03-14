@@ -203,7 +203,7 @@
                 </button>
                 <!-- Кнопка "Снять бронирование" (видна только админам на забронированных книгах) -->
                 <button id="unreserveButton" type="button" class="btn btn-danger" data-bs-toggle="modal"
-                        data-bs-target="#unreserveModal">
+                        data-bs-target="#unreserveModal" th:if="${userRole == 'ROLE_ADMIN'}">
                     Снять бронирование
                 </button>
             </div>
