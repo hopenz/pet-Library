@@ -36,7 +36,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/profile}" style="color: white;"><i class="fa-solid fa-person"></i> Профиль</a>
+                    <a class="nav-link" th:href="@{/profile}" style="color: white;"><i class="fa-solid fa-person"></i>
+                        Профиль</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/logout}" style="color: white;">Выход</a>
@@ -195,9 +196,15 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <!-- Кнопка "Забронировать" -->
-                <button id="reserveButton" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reserveModal">
+                <!-- Кнопка "Забронировать" (видна для незабронированных книг) -->
+                <button id="reserveButton" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#reserveModal">
                     Забронировать
+                </button>
+                <!-- Кнопка "Снять бронирование" (видна только админам на забронированных книгах) -->
+                <button id="unreserveButton" type="button" class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#unreserveModal">
+                    Снять бронирование
                 </button>
             </div>
         </div>
@@ -219,18 +226,41 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                 <!-- Кнопка "Подтвердить бронирование" -->
-                <button type="button" id="confirmReserveButton" class="btn btn-primary">Подтвердить бронирование</button>
+                <button type="button" id="confirmReserveButton" class="btn btn-primary">Подтвердить бронирование
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Модальное окно для подтверждения снятия бронирования -->
+<div class="modal fade" id="unreserveModal" tabindex="-1" aria-labelledby="unreserveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="unreserveModalLabel">Снять бронирование</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите снять бронирование с этой книги?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" id="confirmUnreserveButton" class="btn btn-danger">Снять бронирование</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const bookDetailsModal = document.getElementById('bookDetailsModal');
         const reserveButton = document.getElementById('reserveButton');
+        const unreserveButton = document.getElementById('unreserveButton');
         const confirmReserveButton = document.getElementById('confirmReserveButton');
+        const confirmUnreserveButton = document.getElementById('confirmUnreserveButton');
         const reserveDaysInput = document.getElementById('reserveDays');
         let currentBookId = null; // Будет хранить ID текущей книги
 
@@ -252,11 +282,13 @@
             bookDetailsModal.querySelector('#bookDescription').textContent = bookDescription;
             bookDetailsModal.querySelector('#bookDate').textContent = bookDate;
 
-            // Управление видимостью кнопки "Забронировать"
+            // Управление видимостью кнопок
             if (isBooked) {
                 reserveButton.style.display = 'none';
+                unreserveButton.style.display = 'inline-block';
             } else {
                 reserveButton.style.display = 'inline-block';
+                unreserveButton.style.display = 'none';
             }
         });
 
@@ -279,9 +311,10 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ days: parseInt(days) }),
+                body: JSON.stringify({days: parseInt(days)}),
             })
                 .then(data => {
+                    alert('Книга успешно забронирована!');
                     const reserveModal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
                     reserveModal.hide();
                     window.location.href = '/view/books/search';
@@ -291,7 +324,28 @@
                     alert('Произошла ошибка при бронировании книги.');
                 });
         });
+
+        // Обработчик для кнопки "Снять бронирование"
+        confirmUnreserveButton.addEventListener('click', function () {
+            fetch(`/view/books/${currentBookId}/unlock`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    alert('Бронирование успешно снято!');
+                    const unreserveModal = bootstrap.Modal.getInstance(document.getElementById('unreserveModal'));
+                    unreserveModal.hide();
+                    window.location.href = '/view/books/search';
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при снятии бронирования.');
+                });
+        });
     });
+
 </script>
 
 </body>

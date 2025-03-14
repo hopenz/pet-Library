@@ -50,7 +50,7 @@ public class BookService {
 
         return new ResponseBookDto(bookDB.getId(), bookDB.getTitle(),
                 bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription(),
-                bookDB.isBooked(),bookDB.getPublicationDate(), bookDB.getBookedBefore());
+                bookDB.isBooked(), bookDB.getPublicationDate(), bookDB.getBookedBefore());
     }
 
     public void deleteBook(Long id) {
@@ -71,7 +71,7 @@ public class BookService {
 
         return new ResponseBookDto(book.getId(), book.getTitle(),
                 book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription(),
-                book.isBooked(),book.getPublicationDate(), book.getBookedBefore());
+                book.isBooked(), book.getPublicationDate(), book.getBookedBefore());
     }
 
     @Transactional
@@ -82,7 +82,7 @@ public class BookService {
             Book bookDB = allBooks.get(i);
             responseList.add(new ResponseBookDto(bookDB.getId(), bookDB.getTitle(),
                     bookDB.getAuthor(), bookDB.getPublicationDate(), bookDB.getGenre(), bookDB.getDescription(),
-                    bookDB.isBooked(),bookDB.getPublicationDate(), bookDB.getBookedBefore()));
+                    bookDB.isBooked(), bookDB.getPublicationDate(), bookDB.getBookedBefore()));
         }
 
         return responseList;
@@ -94,7 +94,7 @@ public class BookService {
 
         return new ResponseBookDto(book.getId(), book.getTitle(),
                 book.getAuthor(), book.getPublicationDate(), book.getGenre(), book.getDescription(),
-                book.isBooked(),book.getPublicationDate(),book.getBookedBefore());
+                book.isBooked(), book.getPublicationDate(), book.getBookedBefore());
     }
 
 
@@ -119,7 +119,7 @@ public class BookService {
 
     // В сервисе
     public Page<ResponseBookDto> searchBooks(String query, String genre, Pageable pageable) {
-        Page<Book> bookPage =  bookRepository.findByTitleOrAuthorOrGenre(
+        Page<Book> bookPage = bookRepository.findByTitleOrAuthorOrGenre(
                 query != null ? query : "",
                 genre != null ? genre : "",
                 pageable

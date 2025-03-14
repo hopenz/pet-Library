@@ -1,7 +1,5 @@
 package ru.hopenz.petLibrary.data.dto;
 
-import ru.hopenz.petLibrary.data.entity.User;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 

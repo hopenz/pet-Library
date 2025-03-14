@@ -43,7 +43,7 @@ public class Book {
 
 
     public Book(Long id, String title, String author, LocalDate publicationDate, String genre, String description,
-                User bookedUser, boolean isBooked, LocalDate bookingDate,LocalDate bookedBefore) {
+                User bookedUser, boolean isBooked, LocalDate bookingDate, LocalDate bookedBefore) {
         this.id = id;
         this.title = title;
         this.author = author;

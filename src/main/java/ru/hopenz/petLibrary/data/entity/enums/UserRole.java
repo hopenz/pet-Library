@@ -1,7 +1,5 @@
 package ru.hopenz.petLibrary.data.entity.enums;
 
-import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
-
 public enum UserRole {
 
     ROLE_ADMIN("Администратор"),
