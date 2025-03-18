@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import ru.hopenz.petLibrary.data.dto.RequestUpdateProfile;
 import ru.hopenz.petLibrary.data.entity.User;
 import ru.hopenz.petLibrary.data.entity.enums.UserRole;
 import ru.hopenz.petLibrary.repository.UserRepository;
@@ -45,5 +46,15 @@ public class UserService implements UserDetailsService {
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public User updateUserProfile(String username, RequestUpdateProfile requestUpdateProfile) {
+        User user = userRepository.findByUsername(username);
+
+        user.setName(requestUpdateProfile.name());
+        user.setSurname(requestUpdateProfile.surname());
+        user.setEmail(requestUpdateProfile.email());
+
+        return userRepository.save(user);
     }
 }

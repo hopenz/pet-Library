@@ -36,13 +36,54 @@
 
 <div class="container mt-5">
     <h2>Профиль пользователя</h2>
+    <!-- Кнопка редактирования -->
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+        <i class="fas fa-edit"></i> Редактировать профиль
+    </button>
+
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Информация о пользователе</h5>
-            <p><strong>Имя:</strong> <span th:text="${user.name}"></span></p>
-            <p><strong>Фамилия:</strong> <span th:text="${user.surname}"></span></p>
-            <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+            <p><strong>Имя:</strong> <span id="userName" th:text="${user.name}"></span></p>
+            <p><strong>Фамилия:</strong> <span id="userSurname" th:text="${user.surname}"></span></p>
+            <p><strong>Email:</strong> <span id="userEmail" th:text="${user.email}"></span></p>
             <p><strong>Роль:</strong> <span th:text="${user.getRole().getRole()}"></span></p>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Редактирование профиля</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editProfileForm" th:action="@{/profile/update}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Имя</label>
+                            <input type="text" class="form-control" id="editName" name="name"
+                                   th:value="${user.name}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSurname" class="form-label">Фамилия</label>
+                            <input type="text" class="form-control" id="editSurname" name="surname"
+                                   th:value="${user.surname}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email"
+                                   th:value="${user.email}" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -77,5 +118,45 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Обработка отправки формы
+        document.getElementById('editProfileForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка сети');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('userName').textContent = data.user.name;
+                        document.getElementById('userSurname').textContent = data.user.surname;
+                        document.getElementById('userEmail').textContent = data.user.email;
+
+                        bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+                        alert('Данные успешно обновлены!');
+                    } else {
+                        alert('Ошибка обновления: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при обновлении данных');
+                });
+        });
+    });
+</script>
 </body>
 </html>

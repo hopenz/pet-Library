@@ -1,16 +1,18 @@
 package ru.hopenz.petLibrary.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import ru.hopenz.petLibrary.data.dto.RequestUpdateProfile;
 import ru.hopenz.petLibrary.data.entity.User;
 import ru.hopenz.petLibrary.data.entity.enums.UserRole;
 import ru.hopenz.petLibrary.repository.UserRepository;
 import ru.hopenz.petLibrary.service.UserService;
 
 import java.security.Principal;
+import java.util.Map;
 
 @Controller
 @RequestMapping
@@ -37,6 +39,28 @@ public class ViewProfileController {
         model.addAttribute("userRole", role.name());
 
         return "profile";
+    }
+
+    @PostMapping("/profile/update")
+    @ResponseBody
+    public ResponseEntity<?> updateProfile(@ModelAttribute RequestUpdateProfile requestUpdateProfile,
+                                           Principal principal) {
+        try {
+            User updatedUser = userService.updateUserProfile(principal.getName(), requestUpdateProfile);
+            return ResponseEntity.ok().body(Map.of(
+                    "success", true,
+                    "user", Map.of(
+                            "name", updatedUser.getName(),
+                            "surname", updatedUser.getSurname(),
+                            "email", updatedUser.getEmail()
+                    )
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
+        }
     }
 
 }
