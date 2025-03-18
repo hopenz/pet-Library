@@ -10,10 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.hopenz.petLibrary.data.dto.RequestBookDto;
-import ru.hopenz.petLibrary.data.dto.RequestFiltersForBooksDto;
-import ru.hopenz.petLibrary.data.dto.RequestGenreForBooksDto;
-import ru.hopenz.petLibrary.data.dto.ResponseBookDto;
+import ru.hopenz.petLibrary.data.dto.book.RequestBookDto;
+import ru.hopenz.petLibrary.data.dto.book.RequestFiltersForBooksDto;
+import ru.hopenz.petLibrary.data.dto.book.RequestGenreForBooksDto;
+import ru.hopenz.petLibrary.data.dto.book.ResponseBookDto;
 import ru.hopenz.petLibrary.data.mapper.BookMapper;
 import ru.hopenz.petLibrary.service.BookService;
 

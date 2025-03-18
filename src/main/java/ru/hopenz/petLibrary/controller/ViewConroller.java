@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.hopenz.petLibrary.data.dto.ResponseBookDto;
+import ru.hopenz.petLibrary.data.dto.book.ResponseBookDto;
 import ru.hopenz.petLibrary.data.entity.User;
 import ru.hopenz.petLibrary.data.entity.enums.UserRole;
 import ru.hopenz.petLibrary.repository.UserRepository;

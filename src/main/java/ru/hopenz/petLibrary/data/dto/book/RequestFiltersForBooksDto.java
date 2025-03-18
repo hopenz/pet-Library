@@ -1,4 +1,4 @@
-package ru.hopenz.petLibrary.data.dto;
+package ru.hopenz.petLibrary.data.dto.book;
 
 import java.io.Serializable;
 
